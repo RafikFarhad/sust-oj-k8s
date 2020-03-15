@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: sourcecode
+  name: rmq-configs
+  labels:
+    app: code
+    env: prod
+    type: rmq
+data:
+  rabbitmq.config: |
+    [
+      {
+        rabbit,
+          [
+            { loopback_users, [] }
+          ]
+      },
+      {
+        rabbitmq_management,
+          [
+            { load_definitions, "/etc/rabbitmq/rabbitmq.config.json" }
+          ]
+      }
+    ].
+  rabbitmq.config.json: |
+    {"rabbit_version":"3.8.3","users":[{"name":"admin","password_hash":"HrKAifL/I01zTAFqDAko7DKXoYUDRJBcG6IDbHdp5IevJcRd","tags":"administrator"},{"name":"python_client","password_hash":"HrKAifL/I01zTAFqDAko7DKXoYUDRJBcG6IDbHdp5IevJcRd","tags":"administrator"},{"name":"web_client","password_hash":"HrKAifL/I01zTAFqDAko7DKXoYUDRJBcG6IDbHdp5IevJcRd","tags":"administrator"}],"vhosts":[{"name":"/"}],"permissions":[{"user":"admin","vhost":"/","configure":".*","write":".*","read":".*"},{"user":"python_client","vhost":"/","configure":".*","write":".*","read":".*"},{"user":"web_client","vhost":"/","configure":".*","write":".*","read":".*"}],"parameters":[],"policies":[],"queues":[{"name":"submissions","vhost":"/","durable":true,"auto_delete":false,"arguments":{}},{"name":"notifications","vhost":"/","durable":true,"auto_delete":false,"arguments":{"x-message-ttl":600000}}],"exchanges":[{"name":"notification_exc","vhost":"/","type":"direct","durable":true,"auto_delete":false,"internal":false,"arguments":{}},{"name":"submission_exc","vhost":"/","type":"direct","durable":true,"auto_delete":false,"internal":false,"arguments":{}}],"bindings":[{"source":"notification_exc","vhost":"/","destination":"notifications","destination_type":"queue","routing_key":"push_to_notifications","arguments":{}},{"source":"submission_exc","vhost":"/","destination":"submissions","destination_type":"queue","routing_key":"push_to_submissions","arguments":{}}]}

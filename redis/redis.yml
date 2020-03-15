@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: sourcecode
+  name: redis-deploy
+spec:
+  selector:
+    matchLabels:
+      app: code
+      env: prod
+      type: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: code
+        env: prod
+        type: redis
+    spec:
+      containers:
+      - name: redis-pod
+        image: redis:5.0.8
+        command:
+        - "redis-server"
+        - "/usr/local/etc/redis/redis.conf"
+        - "--appendonly yes"
+        - "--requirepass $(REDIS_PASSWORD)"
+        ports:
+        - containerPort: 6379
+        env:
+        - name: MASTER
+          value: "true"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: password
+        volumeMounts:
+        - name:  redis-data
+          mountPath:  /redis-data
+        - name: redis-config
+          mountPath: /usr/local/etc/redis
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: "512M"
+      volumes:
+      - name: redis-data
+        emptyDir: {}
+      - name: redis-config
+        configMap:
+          name: redis-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: redis
+spec:
+  selector:
+    app: code
+    env: prod
+    type: redis
+  type: NodePort
+  ports:
+  - port: 6379
+    nodePort: 32101
+    name: redis-port

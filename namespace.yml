@@ -1,0 +1,13 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: sourcecode
+  labels:
+    name: code
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: sourcecode-dev
+  labels:
+    name: code
