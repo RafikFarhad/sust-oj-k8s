@@ -42,8 +42,8 @@ spec:
           mountPath: /usr/local/etc/redis
         resources:
           limits:
-            cpu: "0.1"
-            memory: "512M"
+            cpu: 0.1m
+            memory: 256M
       volumes:
       - name: redis-data
         emptyDir: {}

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: deploy
+spec:
+  selector:
+    matchLabels:
+      app: code
+      env: prod
+      type: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: code
+        env: prod
+        type: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0.14
+          args:
+            - --default-authentication-plugin=mysql_native_password
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+              subPath: mysql
+            - name: config-volume
+              mountPath: /etc/mysql/conf.d
+          resources:
+            limits:
+              cpu: 0.1m
+              memory: 512M
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim-1
+        - name: config-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: service
+spec:
+  selector:
+    app: code
+    env: prod
+    type: mysql
+  type: NodePort
+  ports:
+    - port: 3306
+      nodePort: 32106
+      name: mysql-port

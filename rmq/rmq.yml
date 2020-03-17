@@ -34,8 +34,8 @@ spec:
           readOnly: true
         resources:
           limits:
-            cpu: "0.1"
-            memory: "512M"
+            cpu: 0.1m
+            memory: 256M
       volumes:
       - name: rmq-config-volume
         configMap:

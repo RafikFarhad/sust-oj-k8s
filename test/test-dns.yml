@@ -18,4 +18,4 @@ spec:
       limits:
         cpu: "0.1"
         memory: 512M
-  restartPolicy: Always
+  restartPolicy: Never

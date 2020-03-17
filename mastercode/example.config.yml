@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mastercode-configs
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: env
+data:
+  .env: |
+    APP_KEY=
+    APP_URL=http://api.beta.sustcseoj.com
+
+    LOG_CHANNEL=stack
+
+    DB_CONNECTION=mysql
+    DB_HOST=mysql-service.sourcecode
+    DB_DATABASE=source_code_v2
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    TELESCOPE_ENABLED=true
+    TELESCOPE_DB_CONNECTION=telescope
+    TELESCOPE_DB_HOST=mysql-service.sourcecode
+    TELESCOPE_MASTER_DB_DATABASE=master_telescope
+    TELESCOPE_DB_USERNAME=root
+    TELESCOPE_DB_PASSWORD=
+
+    CACHE_DRIVER=redis
+    QUEUE_CONNECTION=database
+    SESSION_DRIVER=redis
+    SESSION_LIFETIME=120
+
+    JWT_SECRET=9deps/dyhe=dhwkg
+
+    INITIAL_VERIFICATION_STATUS=VERIFIED
+
+    # Message Broker
+    MESSAGE_BROKER_SERVICE=rabbitmq # [ rabbitmq | redis | port]
+
+    REDIS_HOST=redis-service.sourcecode
+    REDIS_PASSWORD=sustcse
+    REDIS_PORT=6379
+
+    RMQ_HOST=rmq-service.sourcecode
+    RMQ_PORT=5672
+    RMQ_USER=
+    RMQ_PASSWORD=
+
+    LIVE_CODE_ADDRESS=http://live.beta.sustcseoj.com
+
+    STORAGE_ACCESS_KEY_ID=root
+    STORAGE_SECRET_ACCESS_KEY=
+    STORAGE_DEFAULT_REGION=us-east1
+    STORAGE_BUCKET=judge
+    STORAGE_URL=http://content.code.fs/judge
+    STORAGE_ENDPOINT=http://minio:9000
+
+    MAIL_DRIVER=ses
+    AWS_ACCESS_KEY_ID=
+    AWS_SECRET_ACCESS_KEY=
+    AWS_DEFAULT_REGION=
+
+  default.conf: |
+    server {
+      listen 80;
+      #listen   [::]:80 default ipv6only=on; ## listen for ipv6
+      server_name application;
+
+      access_log off;
+      error_log /dev/stdout;
+
+      root /var/www/html/public;
+      index index.php;
+
+      charset utf-8;
+
+      # this causes issues with Docker
+      sendfile off;
+
+      location = favicon.ico {
+          log_not_found off; access_log off;
+      }
+      location = robots.txt {
+          access_log off; log_not_found off;
+      }
+
+      # look for local files on the container before sending the request to fpm
+      location / {
+          try_files $uri /index.php?$query_string;
+      }
+
+      # nothing local, let fpm handle it
+      location ~ [^/]\.php(/|$) {
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          fastcgi_pass localhost:9000;
+          fastcgi_index index.php;
+          include fastcgi_params;
+          fastcgi_param REQUEST_METHOD $request_method;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          fastcgi_param QUERY_STRING $query_string;
+          fastcgi_param CONTENT_TYPE $content_type;
+          fastcgi_param CONTENT_LENGTH $content_length;
+          # Httpoxy exploit (https://httpoxy.org/) fix
+          fastcgi_param HTTP_PROXY "";
+      }
+
+      # Deny .htaccess file access
+      location ~ /\.ht {
+          deny all;
+      }
+    }

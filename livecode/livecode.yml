@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livecode-deploy
+  namespace: sourcecode
+spec:
+  selector:
+    matchLabels:
+      app: code
+      env: prod
+      type: livecode
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: code
+        env: prod
+        type: livecode
+    spec:
+      containers:
+      - name: livecode-pod
+        image: gcr.io/source-code-oj/livecode:0.0.1
+        ports:
+        - containerPort: 3333
+        volumeMounts:
+        - name: env-volume
+          mountPath: /var/www/.env
+          subPath: .env
+          readOnly: true
+        resources:
+          limits:
+            cpu: .1m
+            memory: 256M
+      restartPolicy: Always
+      volumes:
+      - name: env-volume
+        configMap:
+          name:  livecode-env-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: livecode-service
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: livecode
+spec:
+  selector:
+    app: code
+    env: prod
+    type: livecode
+  type: NodePort
+  ports:
+  - port: 3333
+    nodePort: 32104
+    name: livecode-port
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: livecode-ingress
+  namespace: sourcecode
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.org/websocket-services: "livecode-service"
+spec:
+  rules:
+  - host: live.beta.sustcseoj.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: livecode-service
+          servicePort: 3333
+      - path: /(.*).io
+        backend:
+          serviceName: livecode-service
+          servicePort: 3333

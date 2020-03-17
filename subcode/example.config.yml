@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: subcode-configs
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: env
+data:
+  .env: |
+    APP_KEY=base64:+vnUz7/5vOPykQTm9M3kU7Y0C2amUW7TrMCRyLpkXWw=
+    APP_URL=http://judge.beta.sustcseoj.com
+
+    LOG_CHANNEL=stack
+
+    DB_CONNECTION=mysql
+    DB_HOST=mysql-service.sourcecode
+    DB_DATABASE=source_code_v2
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    TELESCOPE_ENABLED=true
+    TELESCOPE_DB_CONNECTION=telescope
+    TELESCOPE_DB_HOST=mysql-service.sourcecode
+    TELESCOPE_DB_DATABASE=sub_telescope
+    TELESCOPE_DB_USERNAME=root
+    TELESCOPE_DB_PASSWORD=
+
+    BROADCAST_DRIVER=log
+    CACHE_DRIVER=redis
+    QUEUE_CONNECTION=database
+    SESSION_DRIVER=redis
+    SESSION_LIFETIME=120
+
+
+    # MAX IO SIZE IN MB, LIMIT [1-50]
+    MIX_MAX_IO_SIZE=10
+
+    # Message Broker
+    MESSAGE_BROKER_SERVICE=rabbitmq # [ rabbitmq | redis | port]
+
+    REDIS_HOST=redis-service.sourcecode
+    REDIS_PASSWORD=
+    REDIS_PORT=6379
+
+    RMQ_HOST=rmq-service.sourcecode
+    RMQ_PORT=5672
+    RMQ_USER=
+    RMQ_PASSWORD=
+
+    LIVE_CODE_ADDRESS=http://live.beta.sustcseoj.com
+
+    STORAGE_ACCESS_KEY_ID=
+    STORAGE_SECRET_ACCESS_KEY=
+    STORAGE_DEFAULT_REGION=
+    STORAGE_BUCKET=
+    STORAGE_URL=
+    STORAGE_ENDPOINT=
+
+
+  default.conf: |
+    server {
+      listen 80;
+      # listen   [::]:80 default ipv6only=on; ## listen for ipv6
+      server_name _;
+
+      access_log off;
+      error_log /dev/stdout;
+
+      root /var/www/html/public;
+      index index.php;
+
+      charset utf-8;
+
+      # this causes issues with Docker
+      sendfile off;
+
+      location = favicon.ico {
+          log_not_found off; access_log off;
+      }
+      location = robots.txt {
+          access_log off; log_not_found off;
+      }
+
+      # look for local files on the container before sending the request to fpm
+      location / {
+          try_files $uri /index.php?$query_string;
+      }
+
+      # nothing local, let fpm handle it
+      location ~ [^/]\.php(/|$) {
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          fastcgi_pass localhost:9000;
+          fastcgi_index index.php;
+          include fastcgi_params;
+          fastcgi_param REQUEST_METHOD $request_method;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          fastcgi_param QUERY_STRING $query_string;
+          fastcgi_param CONTENT_TYPE $content_type;
+          fastcgi_param CONTENT_LENGTH $content_length;
+          # Httpoxy exploit (https://httpoxy.org/) fix
+          fastcgi_param HTTP_PROXY "";
+      }
+
+      # Deny .htaccess file access
+      location ~ /\.ht {
+          deny all;
+      }
+    }
