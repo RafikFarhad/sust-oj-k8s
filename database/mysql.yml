@@ -22,6 +22,13 @@ spec:
         env: prod
         type: mysql
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud.google.com/gke-preemptible
+                operator: DoesNotExist
       containers:
         - name: mysql
           image: mysql:8.0.14
@@ -43,8 +50,8 @@ spec:
               mountPath: /etc/mysql/conf.d
           resources:
             limits:
-              cpu: 0.1m
-              memory: 512M
+              cpu: 400m
+              memory: 800M
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:

@@ -42,7 +42,7 @@ spec:
           mountPath: /usr/local/etc/redis
         resources:
           limits:
-            cpu: 0.1m
+            cpu: 250m
             memory: 256M
       volumes:
       - name: redis-data

@@ -33,8 +33,8 @@ spec:
           readOnly: true
         resources:
           limits:
-            cpu: 0.5m
-            memory: 512M
+            cpu: 450m
+            memory: 1024M
       volumes:
       - name: subcode-config-volume
         configMap:
