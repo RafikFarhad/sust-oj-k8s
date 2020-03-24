@@ -26,7 +26,7 @@ spec:
                 operator: Exists
       containers:
       - name: judgemod-pod
-        image: gcr.io/source-code-oj/judgemod:0.0.2
+        image: gcr.io/source-code-oj/judgemod:v2-alpha
         volumeMounts:
         - name: judge-mod-config-volume
           mountPath: /home/judge/judgeMod/sustoj/config.ini

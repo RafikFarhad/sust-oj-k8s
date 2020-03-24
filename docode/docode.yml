@@ -26,7 +26,7 @@ spec:
                 operator: Exists
       containers:
       - name: docode-pod
-        image: gcr.io/source-code-oj/docode:0.0.3
+        image: gcr.io/source-code-oj/docode:0.0.4
         ports:
         - containerPort: 3000
         resources:
@@ -63,8 +63,10 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
-  # tls:
-  # - secretName: ssl-key-beta.sustcseoj.com
+  tls:
+  - secretName: ssl-key-beta.sustcseoj.com
+    hosts:
+      - beta.sustcseoj.com
   rules:
   - host: beta.sustcseoj.com
     http:

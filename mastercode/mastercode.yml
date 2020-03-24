@@ -26,7 +26,7 @@ spec:
                 operator: Exists
       containers:
       - name: mastercode-pod
-        image: gcr.io/source-code-oj/mastercode:0.0.2
+        image: gcr.io/source-code-oj/mastercode:0.0.3
         ports:
         - containerPort: 80
         volumeMounts:
@@ -78,10 +78,10 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
-  # tls:
-  # - hosts: 
-  #   - api.beta.sustcseoj.com
-  #   secretName: ssl-key-beta.sustcseoj.com
+  tls:
+  - secretName: ssl-key-api.beta.sustcseoj.com
+    hosts: 
+    - api.beta.sustcseoj.com
   rules:
   - host: api.beta.sustcseoj.com
     http:
