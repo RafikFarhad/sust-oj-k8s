@@ -50,8 +50,8 @@ spec:
               mountPath: /etc/mysql/conf.d
           resources:
             limits:
-              cpu: 400m
-              memory: 800M
+              cpu: 300m
+              memory: 600M
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
