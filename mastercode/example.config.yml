@@ -11,6 +11,7 @@ data:
   .env: |
     APP_KEY=
     APP_URL=http://api.beta.sustcseoj.com
+    FRONT_END_URL=https://beta.sustcseoj.com
 
     LOG_CHANNEL=stack
 

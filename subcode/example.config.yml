@@ -11,6 +11,7 @@ data:
   .env: |
     APP_KEY=base64:+vnUz7/5vOPykQTm9M3kU7Y0C2amUW7TrMCRyLpkXWw=
     APP_URL=http://judge.beta.sustcseoj.com
+    FRONT_END_URL=https://beta.sustcseoj.com
 
     LOG_CHANNEL=stack
 

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: judgemod-deploy
+  name: mastercode-queue-deploy
   namespace: sourcecode
 spec:
   selector:
     matchLabels:
       app: code
       env: prod
-      type: judgemod
+      type: mastercode-queue
   replicas: 1
   template:
     metadata:
       labels:
         app: code
         env: prod
-        type: judgemod
+        type: mastercode-queue
     spec:
       affinity:
         nodeAffinity:
@@ -25,18 +25,21 @@ spec:
               - key: cloud.google.com/gke-preemptible
                 operator: Exists
       containers:
-      - name: judgemod-pod
-        image: gcr.io/source-code-oj/judgemod:v2-alpha2
+      - name: mastercode-queue-pod
+        image: gcr.io/source-code-oj/mastercode-queue:0.0.5
         volumeMounts:
-        - name: judge-mod-config-volume
-          mountPath: /home/judge/judgeMod/sustoj/config.ini
-          subPath: config.ini
+        - name: mastercode-config-volume
+          mountPath: /var/www/html/.env
+          subPath: .env
           readOnly: true
         resources:
-          limits:
+          requests:
             cpu: 100m
-            memory: 1024M
+            memory: 128M
+          limits:
+            cpu: 150m
+            memory: 256M
       volumes:
-      - name: judge-mod-config-volume
-        configMap: 
-          name: judgemod-config
+      - name: mastercode-config-volume
+        configMap:
+          name:  mastercode-configs

@@ -23,7 +23,7 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: cloud.google.com/gke-preemptible
-                operator: DoesNotExist
+                operator: Exists
       containers:
       - name: rmq-pod
         image: rabbitmq:3.8.3-management
