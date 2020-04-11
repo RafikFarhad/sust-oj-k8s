@@ -26,7 +26,7 @@ spec:
                 operator: Exists
       containers:
       - name: mastercode-pod
-        image: gcr.io/source-code-oj/mastercode:0.0.5
+        image: gcr.io/source-code-oj/mastercode:0.0.7
         ports:
         - containerPort: 80
         volumeMounts:

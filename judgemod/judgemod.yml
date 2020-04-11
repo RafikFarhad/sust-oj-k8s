@@ -26,11 +26,15 @@ spec:
                 operator: Exists
       containers:
       - name: judgemod-pod
-        image: gcr.io/source-code-oj/judgemod:v2-alpha2
+        image: gcr.io/source-code-oj/judgemod:v2-alpha2.1
         volumeMounts:
         - name: judge-mod-config-volume
           mountPath: /home/judge/judgeMod/sustoj/config.ini
           subPath: config.ini
+          readOnly: true
+        - name: judge-mod-config-volume
+          mountPath: /home/judge/gcs_service_account.json
+          subPath: gcs_service_account.json
           readOnly: true
         resources:
           limits:

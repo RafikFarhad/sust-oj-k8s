@@ -43,7 +43,7 @@ spec:
               name: redis-secret
               key: password
         volumeMounts:
-        - name:  redis-data
+        - name:  redis-persistant-data
           mountPath:  /redis-data
         - name: redis-config
           mountPath: /usr/local/etc/redis
@@ -52,8 +52,9 @@ spec:
             cpu: 130m
             memory: 200M
       volumes:
-      - name: redis-data
-        emptyDir: {}
+      - name: redis-persistant-data
+        persistentVolumeClaim:
+          claimName: redis-pv-claim-1
       - name: redis-config
         configMap:
           name: redis-config

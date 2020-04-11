@@ -44,6 +44,8 @@ data:
     storage_url = 
     storage_endpoint = 
 
+    account_credential=/home/judge/gcs_service_account.json
+
     [binLanguage]
     lang_ids = 0,1,2,3,5,6,7,8
 

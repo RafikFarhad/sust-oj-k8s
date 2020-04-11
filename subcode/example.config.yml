@@ -59,6 +59,11 @@ data:
     STORAGE_URL=
     STORAGE_ENDPOINT=
 
+    LOG_STASH_ENABLED=false
+    LOG_STASH_PROTOCOL=
+    LOG_STASH_HOST=
+    LOG_STASH_PORT=
+    LOG_STASH_MINIMUM_LOG_LEVEL=
 
   default.conf: |
     server {
