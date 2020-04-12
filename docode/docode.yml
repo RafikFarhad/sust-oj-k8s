@@ -26,7 +26,8 @@ spec:
                 operator: Exists
       containers:
       - name: docode-pod
-        image: gcr.io/source-code-oj/docode:0.0.9
+        image: gcr.io/source-code-oj/docode:0.0.10
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         resources:
