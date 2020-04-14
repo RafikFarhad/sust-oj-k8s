@@ -26,7 +26,7 @@ spec:
                 operator: Exists
       containers:
       - name: mastercode-pod
-        image: gcr.io/source-code-oj/mastercode:0.0.9
+        image: gcr.io/source-code-oj/mastercode:0.0.10
         ports:
         - containerPort: 80
         volumeMounts:
@@ -38,13 +38,13 @@ spec:
           mountPath: /var/www/html/.env
           subPath: .env
           readOnly: true
-        # livenessProbe:
-        #   httpGet:
-        #       path: /api/v1/ping
-        #       port: 80
-        #   initialDelaySeconds: 5
-        #   failureThreshold: 10
-        #   periodSeconds: 5
+        livenessProbe:
+          httpGet:
+              path: /api/v1/ping
+              port: 80
+          initialDelaySeconds: 5
+          failureThreshold: 2
+          periodSeconds: 5
         resources:
           requests:
             cpu: 200m
