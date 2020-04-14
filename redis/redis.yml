@@ -44,7 +44,7 @@ spec:
               key: password
         volumeMounts:
         - name:  redis-persistant-data
-          mountPath:  /redis-data
+          mountPath:  /data
         - name: redis-config
           mountPath: /usr/local/etc/redis
         resources:
