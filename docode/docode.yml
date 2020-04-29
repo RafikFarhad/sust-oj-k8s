@@ -26,15 +26,24 @@ spec:
                 operator: Exists
       containers:
       - name: docode-pod
-        image: gcr.io/source-code-oj/docode:0.0.11
+        image: gcr.io/source-code-oj/docode:0.0.13
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
+        volumeMounts:
+          - name: docode-config-volume
+            mountPath: /var/www/.env
+            subPath: .env
+            readOnly: true
         resources:
           limits:
             cpu: 190m
             memory: 1024M
       restartPolicy: Always
+      volumes:
+      - name: docode-config-volume
+        configMap:
+          name:  docode-configs
 ---
 apiVersion: v1
 kind: Service

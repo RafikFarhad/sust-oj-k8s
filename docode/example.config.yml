@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docode-configs
+  namespace: sourcecode
+  labels:
+    app: code
+    env: prod
+    type: env
+data:
+  .env: |
+    BASE_URL=https://api.beta.sustcseoj.com/api/v1
+    SOCKET_URL=https://live.beta.sustcseoj.com/socket.io
+    RECAPTCHA_SITE_KEY=

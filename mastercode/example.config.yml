@@ -63,6 +63,10 @@ data:
     AWS_SECRET_ACCESS_KEY=
     AWS_DEFAULT_REGION=
 
+    RECAPTCHA_KEY=
+    RECAPTCHA_SECRET=
+
+
   default.conf: |
     server {
       listen 80;

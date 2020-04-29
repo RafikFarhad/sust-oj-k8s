@@ -65,6 +65,9 @@ data:
     LOG_STASH_PORT=
     LOG_STASH_MINIMUM_LOG_LEVEL=
 
+    RECAPTCHA_KEY=
+    RECAPTCHA_SECRET=
+  
   default.conf: |
     server {
       listen 80;
