@@ -58,14 +58,8 @@ data:
     STORAGE_URL=http://content.code.fs/judge
     STORAGE_ENDPOINT=http://minio:9000
 
-    MAIL_DRIVER=ses
-    AWS_ACCESS_KEY_ID=
-    AWS_SECRET_ACCESS_KEY=
-    AWS_DEFAULT_REGION=
-
     RECAPTCHA_KEY=
     RECAPTCHA_SECRET=
-
 
   default.conf: |
     server {

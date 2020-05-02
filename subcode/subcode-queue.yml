@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mastercode-queue-deploy
+  name: subcode-queue-deploy
   namespace: sourcecode
 spec:
   selector:
     matchLabels:
       app: code
       env: prod
-      type: mastercode-queue
+      type: subcode-queue
   replicas: 1
   template:
     metadata:
       labels:
         app: code
         env: prod
-        type: mastercode-queue
+        type: subcode-queue
     spec:
       affinity:
         nodeAffinity:
@@ -25,10 +25,10 @@ spec:
               - key: cloud.google.com/gke-preemptible
                 operator: Exists
       containers:
-      - name: mastercode-queue-pod
-        image: gcr.io/source-code-oj/mastercode-queue:0.0.11
+      - name: subcode-queue-pod
+        image: gcr.io/source-code-oj/subcode-queue:0.0.13
         volumeMounts:
-        - name: mastercode-config-volume
+        - name: subcode-config-volume
           mountPath: /var/www/html/.env
           subPath: .env
           readOnly: true
@@ -40,6 +40,6 @@ spec:
             cpu: 150m
             memory: 256M
       volumes:
-      - name: mastercode-config-volume
+      - name: subcode-config-volume
         configMap:
-          name:  mastercode-configs
+          name:  subcode-configs

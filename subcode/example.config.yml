@@ -67,6 +67,11 @@ data:
 
     RECAPTCHA_KEY=
     RECAPTCHA_SECRET=
+
+    MAIL_MAILER=ses
+    SES_ACCESS_KEY_ID=
+    SES_SECRET_ACCESS_KEY=
+    SES_DEFAULT_REGION=
   
   default.conf: |
     server {
