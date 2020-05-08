@@ -26,7 +26,7 @@ spec:
                 operator: Exists
       containers:
       - name: subcode-pod
-        image: gcr.io/source-code-oj/subcode:0.0.14
+        image: gcr.io/source-code-oj/subcode:0.0.15
         # imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -38,6 +38,10 @@ spec:
         - name: subcode-config-volume
           mountPath: /var/www/html/.env
           subPath: .env
+          readOnly: true
+        - name: subcode-config-volume
+          mountPath: /var/www/html/config/gcs/gcs.json
+          subPath: gcs.json
           readOnly: true
         livenessProbe:
           httpGet:

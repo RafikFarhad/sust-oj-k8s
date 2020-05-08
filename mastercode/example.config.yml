@@ -110,3 +110,6 @@ data:
           deny all;
       }
     }
+
+  gcs.json: |
+     my json credential file

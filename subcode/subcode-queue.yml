@@ -26,11 +26,15 @@ spec:
                 operator: Exists
       containers:
       - name: subcode-queue-pod
-        image: gcr.io/source-code-oj/subcode-queue:0.0.14
+        image: gcr.io/source-code-oj/subcode-queue:0.0.15
         volumeMounts:
         - name: subcode-config-volume
           mountPath: /var/www/html/.env
           subPath: .env
+          readOnly: true
+        - name: subcode-config-volume
+          mountPath: /var/www/html/config/gcs/gcs.json
+          subPath: gcs.json
           readOnly: true
         resources:
           requests:
