@@ -35,6 +35,24 @@ spec:
             mountPath: /var/www/.env
             subPath: .env
             readOnly: true
+          - name: docode-config-volume
+            mountPath: /var/www/static/robots.txt
+            subPath: robots.txt
+            readOnly: true
+        # readinessProbe:
+        #   httpGet:
+        #       path: /login
+        #       port: 80
+        #   initialDelaySeconds: 60
+        #   failureThreshold: 60
+        #   periodSeconds: 5
+        # livenessProbe:
+        #   httpGet:
+        #       path: /login
+        #       port: 80
+        #   initialDelaySeconds: 180
+        #   failureThreshold: 2
+        #   periodSeconds: 10
         resources:
           limits:
             cpu: 190m

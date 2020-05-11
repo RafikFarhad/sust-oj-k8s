@@ -12,3 +12,9 @@ data:
     BASE_URL=https://api.beta.sustcseoj.com/api/v1
     SOCKET_URL=https://live.beta.sustcseoj.com/socket.io
     RECAPTCHA_SITE_KEY=
+  
+  robots.txt : |
+    User-agent: *
+    Disallow: /token/*
+
+    Sitemap: https://judge.beta.sustcseoj.com/sitemap_practice.xml
