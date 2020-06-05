@@ -61,6 +61,6 @@ data:
     vm = java10
 
     [log]
-    log_file_path = /home/judge/judge_log
-    file_log_level = DEBUG
-    console_log_level = INFO
+    log_file_path = /var/log/judgemod
+    file_log_level = INFO
+    console_log_level = DEBUG
