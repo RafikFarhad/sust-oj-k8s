@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    name: ssl-manager
+  name: ssl-manager
+  namespace: sourcecode
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    name: secret-manager
+  name: secret-manager
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    name: ssl-secret-binding
+  name: ssl-secret-binding
+  namespace: sourcecode
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-manager
+subjects:
+  - kind: ServiceAccount
+    name: ssl-manager
+    namespace: sourcecode
