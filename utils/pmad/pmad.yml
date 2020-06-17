@@ -29,10 +29,24 @@ spec:
           env:
             - name: PMA_HOST
               value: mysql-service.sourcecode
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/phpmyadmin/config.user.inc.php
+              subPath: config.user.inc.php
+              readOnly: true
+            - name: pmad-certificates
+              mountPath: /etc/pmad/secrets
           resources:
             limits:
               cpu: 100m
               memory: 128M
+      volumes:
+        - name: pmad-certificates
+          secret:
+            secretName: pmad-certs
+        - name: config-volume
+          configMap:
+            name: pmad-configs
 ---
 apiVersion: v1
 kind: Service
@@ -50,9 +64,9 @@ spec:
     type: pmad
   type: NodePort
   ports:
-  - port: 80
-    nodePort: 32151
-    name: pmad-port
+    - port: 80
+      nodePort: 32151
+      name: pmad-port
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -63,15 +77,15 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   tls:
-  - secretName: ssl-key-pmad.beta.sustcseoj.com
-    hosts: 
-    - api.beta.sustcseoj.com
+    - secretName: ssl-key-pmad.beta.sustcseoj.com
+      hosts:
+        - api.beta.sustcseoj.com
   rules:
-  - host: pmad.beta.sustcseoj.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: pmad-service
-          servicePort: 80
+    - host: pmad.beta.sustcseoj.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: pmad-service
+              servicePort: 80
 # kk create secret tls -n sourcecode-dev  ssl-key-pmad.beta.sustcseoj.com --cert fullchain1.pem --key privkey1.pem

@@ -26,14 +26,14 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: cloud.google.com/gke-preemptible
-                operator: DoesNotExist
+              - matchExpressions:
+                  - key: cloud.google.com/gke-preemptible
+                    operator: DoesNotExist
       containers:
         - name: mysql
           image: mysql:8.0.14
-          args:
-            - --default-authentication-plugin=mysql_native_password
+          # args:
+          #   - --default-authentication-plugin=mysql_native_password
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -47,7 +47,11 @@ spec:
               mountPath: /var/lib/mysql
               subPath: mysql
             - name: config-volume
-              mountPath: /etc/mysql/conf.d
+              mountPath: /etc/mysql/my.cnf
+              subPath: my.cnf
+              readOnly: true
+            - name: certificate-files
+              mountPath: /etc/mysql/secrets
           resources:
             limits:
               cpu: 150m
@@ -57,7 +61,11 @@ spec:
           persistentVolumeClaim:
             claimName: mysql-pv-claim-1
         - name: config-volume
-          emptyDir: {}
+          configMap:
+            name: mysql-configs
+        - name: certificate-files
+          secret:
+            secretName: mysql-certs
 ---
 apiVersion: v1
 kind: Service
