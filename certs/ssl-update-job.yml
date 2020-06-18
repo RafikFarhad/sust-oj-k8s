@@ -19,7 +19,7 @@ spec:
       serviceAccount: ssl-manager
       containers:
       - name: letsencrypt-job-pod
-        image: registry.hub.docker.com/rafikfarhad/kubernetes-nginx-letsencrypt:0.0.13
+        image: registry.hub.docker.com/rafikfarhad/k8s-nginx-letsencrypt:1.0.0
         # command:
         # - sleep
         # - "3600"
@@ -28,11 +28,11 @@ spec:
         - containerPort: 80
         env:
         - name: DOMAINS
-          # value: beta.sustcseoj.com,api.beta.sustcseoj.com,judge.beta.sustcseoj.com,live.beta.sustcseoj.com,rmq.beta.sustcseoj.com
-          value: rmq.beta.sustcseoj.com
+          # value: beta.sustcseoj.com,api.beta.sustcseoj.com,judge.beta.sustcseoj.com,live.beta.sustcseoj.com,rmqdash.beta.sustcseoj.com
+          value: rmqdash.beta.sustcseoj.com
         - name: SECRETS
-          # value: ssl-key-beta.sustcseoj.com,ssl-key-api.beta.sustcseoj.com,ssl-key-judge.beta.sustcseoj.com,ssl-key-live.beta.sustcseoj.com,ssl-key-rmq.beta.sustcseoj.com
-          value: ssl-key-rmq.beta.sustcseoj.com
+          # value: ssl-key-beta.sustcseoj.com,ssl-key-api.beta.sustcseoj.com,ssl-key-judge.beta.sustcseoj.com,ssl-key-live.beta.sustcseoj.com,ssl-key-rmqdash.beta.sustcseoj.com
+          value: ssl-key-rmqdash.beta.sustcseoj.com
         - name: EMAIL
           value: rafikfarhad@gmail.com
         - name: NAMESPACE
@@ -96,7 +96,7 @@ spec:
         backend:
           serviceName: letsencrypt-service
           servicePort: 80
-  - host: rmq.beta.sustcseoj.com
+  - host: rmqdash.beta.sustcseoj.com
     http:
       paths:
       - path: /.well-known

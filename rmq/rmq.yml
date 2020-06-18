@@ -81,11 +81,11 @@ metadata:
     # nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
   tls:
-  - secretName: ssl-key-rmq.beta.sustcseoj.com
+  - secretName: ssl-key-rmqdash.beta.sustcseoj.com
     hosts:
-      - rmq.sustcseoj.com
+      - rmqdash.beta.sustcseoj.com
   rules:
-  - host: rmq.beta.sustcseoj.com
+  - host: rmqdash.beta.sustcseoj.com
     http:
       paths:
       # - path: /
