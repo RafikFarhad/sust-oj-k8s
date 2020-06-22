@@ -36,7 +36,7 @@ data:
 
 
     # MAX IO SIZE IN MB, LIMIT [1-50]
-    MIX_MAX_IO_SIZE=10
+    MIX_MAX_IO_SIZE=20
 
     # Message Broker
     MESSAGE_BROKER_SERVICE=rabbitmq # [ rabbitmq | redis | port]
@@ -74,6 +74,7 @@ data:
     SES_DEFAULT_REGION=
   
   default.conf: |
+    client_max_body_size 100M;
     server {
       listen 80;
       # listen   [::]:80 default ipv6only=on; ## listen for ipv6
@@ -125,3 +126,7 @@ data:
 
   gcs.json: |
      my json credential file
+  
+  php-upload-settings.ini: |
+    upload_max_filesize = 128M
+    post_max_size = 128M
