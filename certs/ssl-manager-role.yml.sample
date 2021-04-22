@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: ssl-manager
+  namespace: kolpotoru-prod
   labels:
     name: ssl-manager
-  name: ssl-manager
-  namespace: sourcecode
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
+  name: secret-manager
   labels:
     name: secret-manager
-  name: secret-manager
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
@@ -20,10 +20,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
+  name: ssl-secret-binding
+  namespace: kolpotoru-prod
   labels:
     name: ssl-secret-binding
-  name: ssl-secret-binding
-  namespace: sourcecode
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -31,4 +31,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: ssl-manager
-    namespace: sourcecode
+    namespace: kolpotoru-prod

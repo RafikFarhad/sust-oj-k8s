@@ -1,0 +1,124 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: letsencrypt-job
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: ssl
+    genre: job
+spec:
+  # selector:
+  #   matchLabels:
+  #     app: kolpotoru
+  #     family: ssl
+  #     genre: pod
+  template:
+    metadata:
+      labels:
+        app: kolpotoru
+        family: ssl
+        genre: pod
+    spec:
+      serviceAccount: ssl-manager
+      containers:
+        - name: letsencrypt-job-pod
+          image: registry.hub.docker.com/rafikfarhad/k8s-nginx-letsencrypt:1.0.0
+          # command:
+          # - sleep
+          # - "3600"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: DOMAINS
+              value: sustcseoj.com,api.sustcseoj.com,judge.sustcseoj.com,live.sustcseoj.com,rmq.sustcseoj.com,pmad.sustcseoj.com
+            - name: SECRETS
+              value: ssl-key-sustcseoj.com,ssl-key-api.sustcseoj.com,ssl-key-judge.sustcseoj.com,ssl-key-live.sustcseoj.com,ssl-key-rmq.sustcseoj.com,ssl-key-pmad.sustcseoj.com
+            - name: EMAIL
+              value: rafikfarhad@gmail.com
+            - name: NAMESPACE
+              value: kolpotoru-prod
+            - name: CLUSTER_ADDRESS
+              value: 0.0.0.0
+              # For the first time DO_NOT_UPDATE_WINDOW should be >= 365
+              # because default nginx ingress has default ssl key validity 
+              # with 365 days.
+              # So at first nginx-ingress will create an auto generated key 
+              # for each of the domain, and this job will update that 
+              # tls secret.
+            - name: DO_NOT_UPDATE_WINDOW
+              value: "365"
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: letsencrypt-service
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: ssl
+    genre: service
+spec:
+  selector:
+    app: kolpotoru
+    family: ssl
+    genre: pod
+  type: NodePort
+  ports:
+    - port: 80
+      nodePort: 32109
+      name: letsencrypt-port
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: letsencrypt-ingress
+  namespace: kolpotoru-prod
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: sustcseoj.com
+      http:
+        paths:
+          - path: /.well-known
+            backend:
+              serviceName: letsencrypt-service
+              servicePort: 80
+    - host: api.sustcseoj.com
+      http:
+        paths:
+          - path: /.well-known
+            backend:
+              serviceName: letsencrypt-service
+              servicePort: 80
+    - host: judge.sustcseoj.com
+      http:
+        paths:
+          - path: /.well-known
+            backend:
+              serviceName: letsencrypt-service
+              servicePort: 80
+    - host: live.sustcseoj.com
+      http:
+        paths:
+          - path: /.well-known
+            backend:
+              serviceName: letsencrypt-service
+              servicePort: 80
+    - host: rmq.sustcseoj.com
+      http:
+        paths:
+          - path: /.well-known
+            backend:
+              serviceName: letsencrypt-service
+              servicePort: 80
+    - host: pmad.sustcseoj.com
+      http:
+        paths:
+          - path: /.well-known
+            backend:
+              serviceName: letsencrypt-service
+              servicePort: 80

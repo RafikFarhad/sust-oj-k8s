@@ -1,0 +1,15 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: kolpotoru-prod
+  labels:
+    name: kolpotoru
+    cluster: prod-cluster
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: kolpotoru-dev
+  labels:
+    name: kolpotoru
+    cluster: prod-cluster

@@ -2,11 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mysql-configs
-  namespace: sourcecode
+  namespace: kolpotoru-prod
   labels:
-    app: code
-    env: prod
-    type: mysql
+    app: kolpotoru
+    family: mysql
+    genre: config
 data:
   my.cnf: |
     [mysqld]
@@ -18,10 +18,10 @@ data:
     # require_secure_transport=ON
     bind-address=0.0.0.0
 
-    ssl
-    ssl-cipher=DHE-RSA-AES256-SHA
-    ssl-ca=/etc/mysql/secrets/ca-cert.pem
-    ssl-cert=/etc/mysql/secrets/server-cert.pem
-    ssl-key=/etc/mysql/secrets/server-key.pem
+    #ssl
+    #ssl-cipher=DHE-RSA-AES256-SHA
+    #ssl-ca=/etc/mysql/secrets/ca-cert.pem
+    #ssl-cert=/etc/mysql/secrets/server-cert.pem
+    #ssl-key=/etc/mysql/secrets/server-key.pem
 
     !includedir /etc/mysql/conf.d/

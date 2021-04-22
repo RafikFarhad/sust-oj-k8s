@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: livecode-env-configs
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: livecode
+    genre: config
+data:
+  .env: |
+    SLACK_WEB_HOOK=https://hooks.slack.com/services/XXXXXXX/YYYYYYYYYYY/ZZZZZZZZZZZZZZ
+    APP_DEBUG=true
+    #
+    LIVE_IP=0.0.0.0
+    LIVE_PORT=3333
+    #
+    REDIS_HOST=redis-service.kolpotoru-prod
+    REDIS_PORT=6379
+    REDIS_DB=1
+    REDIS_PASSWORD=${REDIS_PASSWORD}
+    #
+    RMQ_HOST=rmq-service.kolpotoru-prod
+    RMQ_PORT=5672
+    RMQ_USER=web_client
+    RMQ_PASSWORD=${RMQ_PASSWORD}
+    #
+    AWS_ACCESS_KEY=""
+    AWS_SECRET_ACCESS_KEY=""
+    AWS_REGION="ap-south-1"
+

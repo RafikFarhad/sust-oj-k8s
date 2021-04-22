@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livecode-deploy
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: livecode
+    genre: deploy
+spec:
+  selector:
+    matchLabels:
+      app: kolpotoru
+      family: livecode
+      genre: pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kolpotoru
+        family: livecode
+        genre: pod
+    spec:
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #         - matchExpressions:
+      #             - key: cloud.google.com/gke-preemptible
+      #               operator: Exists
+      imagePullSecrets:
+        - name: sourcecode-gcr-pull-secret
+      containers:
+        - name: livecode-pod
+          image: gcr.io/source-code-oj/livecode:0.0.8
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3333
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: password
+                  optional: false
+            - name: RMQ_PASSWORD
+              value: plain-password-for-rmq # TODO:: password should come from secrets kind ⬆️
+          volumeMounts:
+            - name: env-volume
+              mountPath: /var/www/.env
+              subPath: .env
+              readOnly: true
+          resources:
+            requests:
+              cpu: 150m
+              memory: 256M
+            limits:
+              cpu: 250m
+              memory: 512M
+      restartPolicy: Always
+      volumes:
+        - name: env-volume
+          configMap:
+            name: livecode-env-configs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: livecode-service
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: livecode
+    genre: service
+spec:
+  selector:
+    app: kolpotoru
+    family: livecode
+    genre: pod
+  type: NodePort
+  ports:
+    - port: 3333
+      nodePort: 32104
+      name: livecode-port
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: livecode-ingress
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: livecode
+    genre: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.org/websocket-services: "livecode-service"
+spec:
+  tls:
+    - secretName: ssl-key-live.sustcseoj.com
+      hosts:
+        - live.sustcseoj.com
+  rules:
+    - host: live.sustcseoj.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: livecode-service
+              servicePort: 3333
+          - path: /(.*).io
+            backend:
+              serviceName: livecode-service
+              servicePort: 3333

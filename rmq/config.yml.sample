@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: ConfigMap # TODO :: Should be in Secret type
+metadata:
+  namespace: kolpotoru-prod
+  name: rmq-configs
+  labels:
+    app: kolpotoru
+    env: prod
+    type: rmq
+data:
+  rabbitmq.config: |
+    [
+      {
+        rabbit,
+          [
+            { loopback_users, [] }
+          ]
+      },
+      {
+        rabbitmq_management,
+          [
+            { load_definitions, "/etc/rabbitmq/rabbitmq.config.json" }
+          ]
+      }
+    ].
+  rabbitmq.config.json: |
+    {
+    "rabbit_version": "3.8.3",
+    "users": [
+      {
+        "name": "web_client",
+        "password_hash": "generated_hash_by_shell_script",
+        "hashing_algorithm": "rabbit_password_hashing_sha256",
+        "tags": "administrator"
+      },
+      {
+        "name": "python_client",
+        "password_hash": "generated_hash_by_shell_script",
+        "hashing_algorithm": "rabbit_password_hashing_sha256",
+        "tags": "administrator"
+      },
+      {
+        "name": "admin",
+        "password_hash": "generated_hash_by_shell_script",
+        "hashing_algorithm": "rabbit_password_hashing_sha256",
+        "tags": "administrator"
+      }
+    ],
+    "vhosts": [
+      {
+        "name": "/"
+      }
+    ],
+    "permissions": [
+      {
+        "user": "web_client",
+        "vhost": "/",
+        "configure": ".*",
+        "write": ".*",
+        "read": ".*"
+      },
+      {
+        "user": "admin",
+        "vhost": "/",
+        "configure": ".*",
+        "write": ".*",
+        "read": ".*"
+      },
+      {
+        "user": "python_client",
+        "vhost": "/",
+        "configure": ".*",
+        "write": ".*",
+        "read": ".*"
+      }
+    ],
+    "topic_permissions": [],
+    "parameters": [],
+    "global_parameters": [
+      {
+        "name": "cluster_name",
+        "value": "rabbit-master@kolpotoru"
+      }
+    ],
+    "policies": [],
+    "queues": [
+      {
+        "name": "emails",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {}
+      },
+      {
+        "name": "notifications",
+        "vhost": "/",
+        "durable": false,
+        "auto_delete": true,
+        "arguments": {
+          "x-message-ttl": 600000
+        }
+      },
+      {
+        "name": "submissions",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {}
+      }
+    ],
+    "exchanges": [
+      {
+        "name": "submission_exc",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      },
+      {
+        "name": "email_exc",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      },
+      {
+        "name": "notification_exc",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      }
+    ],
+    "bindings": [
+      {
+        "source": "email_exc",
+        "vhost": "/",
+        "destination": "emails",
+        "destination_type": "queue",
+        "routing_key": "push_to_emails",
+        "arguments": {}
+      },
+      {
+        "source": "notification_exc",
+        "vhost": "/",
+        "destination": "notifications",
+        "destination_type": "queue",
+        "routing_key": "push_to_notifications",
+        "arguments": {}
+      },
+      {
+        "source": "submission_exc",
+        "vhost": "/",
+        "destination": "submissions",
+        "destination_type": "queue",
+        "routing_key": "push_to_submissions",
+        "arguments": {}
+      }
+    ]
+    }

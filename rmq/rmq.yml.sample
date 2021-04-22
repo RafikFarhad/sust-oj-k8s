@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+# TODO :: StatefulSet should be reconsider because mnesia got broken sometime
+kind: StatefulSet 
+metadata:
+  name: rmq-stateful
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: rmq
+    genre: stateful-set
+spec:
+  selector:
+    matchLabels:
+      app: kolpotoru
+      family: rmq
+      genre: pod
+  replicas: 1
+  serviceName: rmq-service
+  template:
+    metadata:
+      name: rmq-pod-template
+      namespace: kolpotoru-prod
+      labels:
+        app: kolpotoru
+        family: rmq
+        genre: pod
+    spec:
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #         - matchExpressions:
+      #             - key: cloud.google.com/gke-preemptible
+      #               operator: DoesNotExist
+      containers:
+        - name: rmq-container
+          image: rabbitmq:3.8.3-management
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          volumeMounts:
+            # - name: rmq-pv-claim
+            #   mountPath: /var/lib/rabbitmq/mnesia
+            - name: rmq-config-volume
+              mountPath: /etc/rabbitmq/rabbitmq.config
+              subPath: rabbitmq.config
+              readOnly: true
+            - name: rmq-config-volume
+              mountPath: /etc/rabbitmq/rabbitmq.config.json
+              subPath: rabbitmq.config.json
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128M
+            limits:
+              cpu: 300m
+              memory: 256M
+          readinessProbe:
+            tcpSocket: 
+              port: 15672
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: 
+              port: 15672
+            failureThreshold: 3
+            periodSeconds: 60
+      volumes:
+        - name: rmq-config-volume
+          configMap:
+            name: rmq-configs
+  # TODO :: mnesia error check for statefull set
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: rmq-pv-claim
+  #       namespace: kolpotoru-prod
+  #       labels:
+  #         app: kolpotoru
+  #         family: rmq
+  #         genre: pvc
+  #     spec:
+  #       # storageClassName: "standard"
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       resources:
+  #         requests:
+  #           storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rmq-service
+  labels:
+    app: kolpotoru
+    family: rmq
+    genre: service
+spec:
+  selector:
+    app: kolpotoru
+    family: rmq
+    genre: pod
+  type: NodePort
+  ports:
+    - port: 15672
+      nodePort: 32102
+      name: rmq-http
+    - port: 5672
+      nodePort: 32103
+      name: rmq-amqp
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: kolpotoru-prod
+  name: rmq-ingress
+  labels:
+    app: kolpotoru
+    family: rmq
+    genre: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - secretName: ssl-key-rmq.sustcseoj.com
+    hosts:
+      - rmq.sustcseoj.com
+  rules:
+    - host: rmq.sustcseoj.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: rmq-service
+              servicePort: 15672

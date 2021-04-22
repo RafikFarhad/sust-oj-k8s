@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-stateful
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: redis
+    genre: stateful-set
+spec:
+  selector:
+    matchLabels:
+      app: kolpotoru
+      family: redis
+      genre: pod
+  replicas: 1
+  serviceName: redis-service
+  template:
+    metadata:
+      name: redis-pod-template
+      namespace: kolpotoru-prod
+      labels:
+        app: kolpotoru
+        family: redis
+        genre: pod
+    spec:
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #         - matchExpressions:
+      #             - key: cloud.google.com/gke-preemptible
+      #               # operator: DoesNotExist
+      #               operator: Exists
+      containers:
+        - name: redis-container
+          image: redis:5.0.8
+          command:
+            - "redis-server"
+            - "/usr/local/etc/redis/redis.conf"
+            - "--appendonly yes"
+            - "--requirepass $(REDIS_PASSWORD)"
+          ports:
+            - containerPort: 6379
+              name: redis-port
+          env:
+            - name: MASTER
+              value: "true"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: password
+          volumeMounts:
+            - name: redis-pv-claim
+              mountPath: /data
+            - name: redis-config-volume
+              mountPath: /usr/local/etc/redis
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128M
+            limits:
+              cpu: 150m
+              memory: 256M
+          readinessProbe:
+            tcpSocket: 
+              port: redis-port
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: 
+              port: redis-port
+            failureThreshold: 3
+            periodSeconds: 60
+      volumes:
+        - name: redis-config-volume
+          configMap:
+            name: redis-configs
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-pv-claim
+        namespace: kolpotoru-prod
+        labels:
+          app: kolpotoru
+          family: redis
+          genre: pvc
+      spec:
+        # storageClassName: "standard"
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: redis
+    genre: service
+spec:
+  selector:
+    app: kolpotoru
+    family: redis
+    genre: pod
+  type: NodePort
+  ports:
+    - port: 6379
+      nodePort: 32101
+      name: redis-port

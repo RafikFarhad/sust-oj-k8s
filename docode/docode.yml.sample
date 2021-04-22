@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docode-deploy
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: docode
+    genre: deploy
+spec:
+  selector:
+    matchLabels:
+      app: kolpotoru
+      family: docode
+      genre: pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kolpotoru
+        family: docode
+        genre: pod
+    spec:
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #         - matchExpressions:
+      #             - key: cloud.google.com/gke-preemptible
+      #               operator: Exists
+      imagePullSecrets:
+        - name: sourcecode-gcr-pull-secret
+      containers:
+        - name: docode-pod
+          image: gcr.io/source-code-oj/docode:0.0.20
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: docode-config-volume
+              mountPath: /var/www/.env
+              subPath: .env
+              readOnly: true
+            - name: docode-config-volume
+              mountPath: /var/www/static/robots.txt
+              subPath: robots.txt
+              readOnly: true
+          # readinessProbe:
+          #   httpGet:
+          #       path: /login
+          #       port: 80
+          #   initialDelaySeconds: 60
+          #   failureThreshold: 60
+          #   periodSeconds: 5
+          # livenessProbe:
+          #   httpGet:
+          #       path: /login
+          #       port: 80
+          #   initialDelaySeconds: 180
+          #   failureThreshold: 2
+          #   periodSeconds: 10
+          resources:
+            requests:
+              cpu: 300m
+              memory: 1Gi
+            limits:
+              cpu: 600m
+              memory: 2Gi
+      restartPolicy: Always
+      volumes:
+        - name: docode-config-volume
+          configMap:
+            name: docode-configs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docode-service
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: docode
+    genre: service
+spec:
+  selector:
+    app: kolpotoru
+    family: docode
+    genre: pod
+  type: NodePort
+  ports:
+    - port: 3000
+      nodePort: 32108
+      name: docode-port
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: docode-ingress
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: docode
+    genre: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+    - secretName: ssl-key-sustcseoj.com
+      hosts:
+        - sustcseoj.com
+  rules:
+    - host: sustcseoj.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: docode-service
+              servicePort: 3000

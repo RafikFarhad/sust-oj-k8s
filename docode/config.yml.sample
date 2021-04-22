@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docode-configs
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: docode
+    genre: docode
+data:
+  .env: |
+    BASE_URL=https://api.sustcseoj.com/api/v1
+    SOCKET_URL=https://live.sustcseoj.com
+    RECAPTCHA_SITE_KEY=
+  
+  robots.txt : |
+    User-agent: *
+    Disallow: /token/*
+
+    Sitemap: https://judge.sustcseoj.com/sitemap_practice.xml

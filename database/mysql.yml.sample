@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: mysql
+    genre: deploy
+spec:
+  selector:
+    matchLabels:
+      app: kolpotoru
+      family: mysql
+      genre: pod
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kolpotoru
+        family: mysql
+        genre: pod
+    spec:
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #         - matchExpressions:
+      #             - key: cloud.google.com/gke-preemptible
+      #               operator: DoesNotExist
+      containers:
+        - name: mysql-container
+          image: mysql:8.0.23
+          args:
+            - --default-authentication-plugin=mysql_native_password
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+          ports:
+            - containerPort: 3306
+              name: mysql-port
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: config-volume
+              mountPath: /etc/mysql/my.cnf
+              subPath: my.cnf
+              readOnly: true
+            # - name: certificate-files
+            #   mountPath: /etc/mysql/secrets
+          resources:
+            requests:
+              cpu: 150m
+              memory: 512M # minimum possible: 512M
+            limits:
+              cpu: 300m
+              memory: 702M
+          livenessProbe:
+            tcpSocket: 
+              port: mysql-port
+            periodSeconds: 60
+          readinessProbe:
+            tcpSocket: 
+              port: mysql-port
+            initialDelaySeconds: 30
+            failureThreshold: 5
+            periodSeconds: 10
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim-1
+        - name: config-volume
+          configMap:
+            name: mysql-configs
+        # - name: certificate-files
+        #   secret:
+        #     secretName: mysql-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: mysql
+    genre: service
+spec:
+  selector:
+    app: kolpotoru
+    family: mysql
+    genre: pod
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: mysql-port
+      protocol: TCP

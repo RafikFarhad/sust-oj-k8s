@@ -18,14 +18,14 @@ Begining of this project we started with `Laravel 5` as our web end, `Python2.7`
 | Repository                                                                                    | Technology    | Role                                   |
 | --------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- |
 | [judgeMod](https://github.com/talatmursalin/judgeMod)                                         | Python3       | Judging and Sandboxing                 |
-| [masterCODE](https://github.com/RafikFarhad/masterCODE)                                       | Laravel 7     | Main API Backend                       |
+| [masterCODE](https://github.com/RafikFarhad/masterCODE)                                       | Laravel 8     | Main API Backend                       |
 | [doCODE](https://github.com/RafikFarhad/doCODE)                                               | NuxtJS        | Contestant Frontend                    |
-| [subCODE](https://github.com/RafikFarhad/subCODE)                                             | Laravel 7     | Judge Interface                        |
+| [subCODE](https://github.com/RafikFarhad/subCODE)                                             | Laravel 8     | Judge Interface                        |
 | [liveCODE](https://github.com/RafikFarhad/liveCODE)                                           | NodeJS        | Real time notification provider via WS |
 | -                                                                                             | Minio         | S3 Complient Storage Service           |
 | -                                                                                             | MySQL         | Database Service                       |
 | -                                                                                             | RabbitMQ      | Inter-service messaging service        |
-| -                                                                                             | Redis DB      | Caching Service                        |
+| -                                                                                             | Redis        | Caching Service                        |
 |                                                                                               | ELK Stack     | Logging                                |
 | [push-to-gcr-github-action](https://github.com/marketplace/actions/push-to-gcr-github-action) | Github Action | CI/CD                                  |
 
@@ -37,4 +37,18 @@ We use continuous deployment process in our project. Everytime we released a ver
 
 ## Development
 
-In development, we use `docker-compose` like all others. You can find the `docker-compose` configs file in this repository: [sust-oj-compose](https://github.com/RafikFarhad/sust-oj-compose)
+In development, we use `docker-compose`. You can find the `docker-compose` configs file in this repository: [sust-oj-compose](https://github.com/RafikFarhad/sust-oj-compose)
+
+## Tips
+
+A possible serial to follow
+
+ - create namespace
+ - create docker-container-registry-secrets
+ - create ssl-role, ssl-secrets and run `k8s-nginx-letsencrypt` job
+ - create redis, rabbitmq, mysql with PVC
+ - create subcode and then migrate DB and `php artisan permission:cache`
+ - create livecode and test real time notification
+ - create mastercode and test `/api/v1/ping`
+ - create docode
+ - optional: expose `tcp-services`

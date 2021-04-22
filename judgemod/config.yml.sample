@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: judgemod-config
+  namespace: kolpotoru-prod
+  labels:
+    app: kolpotoru
+    family: judgemod
+    genre: config
+data:
+  config.ini: |
+    
